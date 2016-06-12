@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CS</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_main2">Phase One</string>
+    <string name="DisplayMainMessage">Phase One</string>
+    <string name="Activity2DisplayMessage">Phase One</string>
+    <string name="title_activity_main22">Phase One</string>
+    <string name="selectPicture">Select picture</string>
+    <string name="title_activity_phase_two">PhaseTwoActivity</string>
+    <string name="title_activity_instructions">InstructionsActivity</string>
+</resources>
