@@ -3,7 +3,6 @@ package com.example.bar.medialaxisbgu;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -64,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void button3Click(){
-        Intent intent = new Intent(MainActivity.this, InstructionsActivity.class);
+        Intent intent = new Intent(MainActivity.this, BeginActivity.class);
         Bundle b = new Bundle();
         b.putInt("key",3);
         intent.putExtras(b);

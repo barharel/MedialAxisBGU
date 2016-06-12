@@ -4,16 +4,13 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.VideoView;
 
-public class InstructionsActivity extends Activity
+public class BeginActivity extends Activity
         implements MediaPlayer.OnCompletionListener,MediaPlayer.OnPreparedListener,View.OnTouchListener {
 
         private VideoView mVV;
@@ -22,7 +19,7 @@ public class InstructionsActivity extends Activity
         public void onCreate(Bundle b) {
             super.onCreate(b);
 
-            setContentView(R.layout.activity_instructions);
+            setContentView(R.layout.activity_begin);
 
             int fileRes=1;
 

@@ -43,7 +43,7 @@
             android:label="@string/title_activity_phase_two" >
         </activity>
         <activity
-            android:name=".InstructionsActivity"
+            android:name=".BeginActivity"
             android:label="@string/title_activity_instructions" >
         </activity>
     </application>
