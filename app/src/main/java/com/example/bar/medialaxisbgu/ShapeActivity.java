@@ -35,6 +35,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.Vector;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 public class ShapeActivity extends AppCompatActivity {
@@ -42,19 +45,35 @@ public class ShapeActivity extends AppCompatActivity {
     private String m_text;
     private ImageView m_image;
     private int m_imageId;
+    private int m_current_index;
+    private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 16, 15, 14, 13, 12, 11 };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shape);
         m_image = (ImageView) findViewById(R.id.imageView1);
         addListenerOnView();
-
-        Bundle b = getIntent().getExtras();
-        int imageId = b.getInt("key");
-        m_imageId = imageId;
-        System.out.println("Image Id_________________________" + imageId);
-        loadShape(imageId);
+        shuffleArray(m_order_Array);
+        fixArray(m_order_Array);
+        m_imageId = m_order_Array[m_current_index];
+        loadShape(m_imageId);
         improveColoring();
+
+        //Bundle b = getIntent().getExtras();
+        //int imageId = b.getInt("key");
+        //m_imageId = imageId;
+        //System.out.println("Image Id_________________________" + imageId);
+        /*
+        Buiding order of appearance
+        Array must begin with 2 images of phase 1
+         */
+        /*Log.i(TAG, "====================printing array========================");
+        for(int i=0; i<m_order_Array.length;i++){
+            String msg = "====$" + m_order_Array[i] + "====$";
+            Log.i(TAG, msg);
+        }*/
+
+
     }
 
     protected void improveColoring(){
@@ -197,8 +216,8 @@ public class ShapeActivity extends AppCompatActivity {
         ((ImageView)m_image).getImageMatrix().invert(invertMatrix);
 
         invertMatrix.mapPoints(eventXY);
-        int x = Integer.valueOf((int)eventXY[0]);
-        int y = Integer.valueOf((int)eventXY[1]);
+        int x = Integer.valueOf((int) eventXY[0]);
+        int y = Integer.valueOf((int) eventXY[1]);
 
         Drawable imgDrawable = ((ImageView)m_image).getDrawable();
         Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
@@ -239,37 +258,48 @@ public class ShapeActivity extends AppCompatActivity {
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     m_text =    ("Touch coordinates : " + String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));
-                    String bad_click = "Please tap the Shape, and not outside of it";
                     final String text_to_be_sent = String.valueOf(event.getX()) + "," + String.valueOf(event.getY());
+                    String thanks = "All Done!\n " +
+                            "Thank you for participating in the experiment";
+
                     if (!isWhitePixel(event.getX(), event.getY())){
                         //improveColoring();
                         //colorCoord(event.getX(), event.getY());
                         writeToFile(text_to_be_sent);
                         MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
                         mp.start();
-                        //sleeping
-                        //SystemClock.sleep(5000);
-                        //undoing
-                        //improveColoring();
+
+                        //checking we are not done yet
+
+                        if(m_current_index == m_order_Array.length - 1){
+                            /////////////////////////////Dialog///////////////////////////
+                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                            @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    switch (which) {
+                                        case DialogInterface.BUTTON_POSITIVE:
+                                            //Yes button clicked
+                                            break;
+                                    }
+                                    dialog.dismiss();
+                                    finish();
+                                }
+                            };
+
+                            AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
+                            builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
+
+                        /////////////////////////End Dialog//////////////////////////
+                        }
+                        else {
+                            //loading new photo
+                            m_current_index++;
+                            m_imageId = m_order_Array[m_current_index];
+                            loadShape(m_imageId);
+                            improveColoring();
+                        }
                     }
                     else {
-                       /* /////////////////////////////Dialog///////////////////////////
-                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case DialogInterface.BUTTON_POSITIVE:
-                                    //Yes button clicked
-                                    break;
-                            }
-                            dialog.dismiss();
-                        }
-                    };
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
-                    builder.setMessage(bad_click).setPositiveButton("OK", dialogClickListener)
-                            .show();
-                        /////////////////////////End Dialog///////////////////////////*/
                         MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bad);
                         mp.start();
                     }
@@ -349,5 +379,38 @@ public class ShapeActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    // Implementing Fisher–Yates shuffle
+    static void shuffleArray(int[] ar)
+    {
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        Random rnd = new Random();
+        for (int i = ar.length - 1; i > 0; i--)
+        {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            int a = ar[index];
+            ar[index] = ar[i];
+            ar[i] = a;
+        }
+    }
+
+    static void fixArray(int[] ar)
+    {
+        int j = 0;
+        for (int i = 0 ; i < ar.length; i++)
+        {
+            if(ar[i] < 10) {
+                int index = j;
+                // Simple swap
+                int a = ar[index];
+                ar[index] = ar[i];
+                ar[i] = a;
+                ++j;
+            }
+            if (j>1)
+                break;
+        }
     }
 }
