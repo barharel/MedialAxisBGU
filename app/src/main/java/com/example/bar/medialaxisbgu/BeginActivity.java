@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -19,6 +20,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -42,16 +44,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class BeginActivity extends AppCompatActivity {
     private static final String TAG = "ProjectMessage";
-    private String m_text;
     private ImageView m_image;
-    private int m_imageId;
-    private int m_current_index;
-    private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 16, 15, 14, 13, 12, 11 };
+    private int m_counter = 0;
+    private ImageButton m_go_button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_begin);
         m_image = (ImageView) findViewById(R.id.imageView1);
+        m_go_button = (ImageButton) findViewById(R.id.btnChangeImage);
+        m_go_button.setVisibility(View.INVISIBLE);
+        addListenerOnView();
 
     }
 
@@ -79,102 +83,6 @@ public class BeginActivity extends AppCompatActivity {
 
 
 
-
-    protected void loadShape(int imageId) {
-        switch(imageId){
-            case 1:
-                m_image.setImageResource(R.drawable.triangle);
-                break;
-            case 2:
-                m_image.setImageResource(R.drawable.two_rectangles);
-                break;
-            case 3:
-                m_image.setImageResource(R.drawable.rectangle);
-                break;
-            case 4:
-                m_image.setImageResource(R.drawable.rectangle_missing);
-                break;
-            case 5:
-                m_image.setImageResource(R.drawable.rectangle_missing_2);
-                break;
-            case 6:
-                m_image.setImageResource(R.drawable.circle);
-                break;
-            case 11:
-                m_image.setImageResource(R.drawable.triangle_hidden);
-                break;
-            case 12:
-                m_image.setImageResource(R.drawable.two_rectangles_hidden);
-                break;
-            case 13:
-                m_image.setImageResource(R.drawable.rectangle_hidden);
-                break;
-            case 14:
-                m_image.setImageResource(R.drawable.rectangle_missing_hidden);
-                break;
-            case 15:
-                m_image.setImageResource(R.drawable.rectangle_missing_2_hidden);
-                break;
-            case 16:
-                m_image.setImageResource(R.drawable.circle_hidden);
-                break;
-        }
-    }
-    public void colorCoord(float eventX, float eventY) {
-        Drawable imgDrawable = ((ImageView)m_image).getDrawable();
-        Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
-        Bitmap mutableBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);//&lt;--true makes copy mutable
-        bitmap = mutableBitmap;
-        float[] eventXY = new float[] {eventX, eventY};
-
-        Matrix invertMatrix = new Matrix();
-        ((ImageView)m_image).getImageMatrix().invert(invertMatrix);
-
-        invertMatrix.mapPoints(eventXY);
-        int x = Integer.valueOf((int) eventXY[0]);
-        int y = Integer.valueOf((int) eventXY[1]);
-
-
-
-        String string = "Trying to color coord [" + x + "," + y + "]";
-        Log.i(TAG, string);
-        //coloring
-        for(int i=0; i<20; ++i) {
-            if (x + i < bitmap.getWidth()){
-                int pixel = bitmap.getPixel(x+i,y);
-                int redValue = Color.red(pixel);
-                int blueValue = Color.blue(pixel);
-                int greenValue = Color.green(pixel);
-                if (!((redValue>240) && (blueValue>240) && (greenValue>240)))
-                    bitmap.setPixel(x + i, y, Color.rgb(205, 92, 92));
-            }
-            if (x - i >= 0) {
-                int pixel = bitmap.getPixel(x-i,y);
-                int redValue = Color.red(pixel);
-                int blueValue = Color.blue(pixel);
-                int greenValue = Color.green(pixel);
-                if (!((redValue>240) && (blueValue>240) && (greenValue>240)))
-                    bitmap.setPixel(x - i, y, Color.rgb(205, 92, 92));
-            }
-            if (y + i < bitmap.getHeight()) {
-                int pixel = bitmap.getPixel(x,y+i);
-                int redValue = Color.red(pixel);
-                int blueValue = Color.blue(pixel);
-                int greenValue = Color.green(pixel);
-                if (!((redValue>240) && (blueValue>240) && (greenValue>240)))
-                    bitmap.setPixel(x, y + i, Color.rgb(205, 92, 92));
-            }
-            if (y - i >= 0) {
-                int pixel = bitmap.getPixel(x,y-i);
-                int redValue = Color.red(pixel);
-                int blueValue = Color.blue(pixel);
-                int greenValue = Color.green(pixel);
-                if (!((redValue>240) && (blueValue>240) && (greenValue>240)))
-                    bitmap.setPixel(x, y - i, Color.rgb(205, 92, 92));
-            }
-        }
-        m_image.setImageBitmap(bitmap);
-    }
     public boolean isWhitePixel(float eventX, float eventY) {
         /*Bitmap bitmap = Bitmap.createBitmap(m_image.getDrawingCache())
         String string = "isWhitePixel (" + String.valueOf(x) + ","  + String.valueOf(y) +
@@ -221,9 +129,9 @@ public class BeginActivity extends AppCompatActivity {
                 ") - (" + String.valueOf(redValue) + "," + String.valueOf(blueValue) + "," +
                 String.valueOf(greenValue) + ")";
         Log.i(TAG, string);
-        return ((redValue>240) && (blueValue>240) && (greenValue>240));
-
-
+        return (!(((redValue>198) && (blueValue>198) && (greenValue>198)
+                && (redValue<210) && (blueValue<210) && (greenValue<210))
+                || ((redValue<10) && (blueValue<10) && (greenValue<10))));
 
 
     }
@@ -231,59 +139,47 @@ public class BeginActivity extends AppCompatActivity {
 
     public void addListenerOnView() {
 
-
         m_image.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    m_text =    ("Touch coordinates : " + String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));
                     final String text_to_be_sent = String.valueOf(event.getX()) + "," + String.valueOf(event.getY());
                     String thanks = "All Done!\n " +
                             "Thank you for participating in the experiment";
 
-                    if (!isWhitePixel(event.getX(), event.getY())){
-                        //improveColoring();
-                        //colorCoord(event.getX(), event.getY());
-                        writeToFile(text_to_be_sent);
+                    if (!isWhitePixel(event.getX(), event.getY())) {
                         MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
                         mp.start();
-
-                        //checking we are not done yet
-
-                        if(m_current_index == m_order_Array.length - 1){
-                            /////////////////////////////Dialog///////////////////////////
-                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which) {
-                                        case DialogInterface.BUTTON_POSITIVE:
-                                            //Yes button clicked
-                                            break;
-                                    }
-                                    dialog.dismiss();
-                                    finish();
-                                }
-                            };
-
-                            AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
-                            builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
-
-                            /////////////////////////End Dialog//////////////////////////
+                        m_counter++;
+                        if(m_counter>3){
+                            m_go_button.setVisibility(View.VISIBLE);
                         }
-                        else {
-                            //loading new photo
-                            m_current_index++;
-                            m_imageId = m_order_Array[m_current_index];
-                            loadShape(m_imageId);
-                            improveColoring();
-                        }
-                    }
-                    else {
+
+                    } else {
                         MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bad);
                         mp.start();
                     }
                 }
 
+                return true;
+            }
+        });
+
+
+        m_go_button.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    Intent intent = new Intent(BeginActivity.this, ShapeActivity.class);
+                    Bundle b = new Bundle();
+                    b.putInt("key",1);
+                    intent.putExtras(b);
+                    startActivity(intent);
+                    // finish();
+                    m_counter = 0;
+                    m_go_button.setVisibility(View.INVISIBLE);
+
+                }
                 return true;
             }
         });
@@ -312,84 +208,4 @@ public class BeginActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void writeToFile(String data) {
-        File file;
-        FileOutputStream outputStream;
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("");
-        sb.append(m_imageId);
-        String fileName = sb.toString();
-        fileName = fileName + ".csv";
-        try {
-            File root = new File(Environment.getExternalStorageDirectory(), "CSProject");
-            if (!root.exists()) {
-                root.mkdirs();
-            }
-            file = new File(root, fileName);
-            if(!file.exists()) {
-                data = "X,Y\n" + data ;
-            }
-            BufferedWriter bW;
-
-            bW = new BufferedWriter(new FileWriter(file, true));
-            bW.write(data);
-            bW.newLine();
-            bW.flush();
-            bW.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    /* Checks if external storage is available to at least read */
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    // Implementing Fisher–Yates shuffle
-    static void shuffleArray(int[] ar)
-    {
-        // If running on Java 6 or older, use `new Random()` on RHS here
-        Random rnd = new Random();
-        for (int i = ar.length - 1; i > 0; i--)
-        {
-            int index = rnd.nextInt(i + 1);
-            // Simple swap
-            int a = ar[index];
-            ar[index] = ar[i];
-            ar[i] = a;
-        }
-    }
-
-    static void fixArray(int[] ar)
-    {
-        int j = 0;
-        for (int i = 0 ; i < ar.length; i++)
-        {
-            if(ar[i] < 10) {
-                int index = j;
-                // Simple swap
-                int a = ar[index];
-                ar[index] = ar[i];
-                ar[i] = a;
-                ++j;
-            }
-            if (j>1)
-                break;
-        }
-    }
 }
