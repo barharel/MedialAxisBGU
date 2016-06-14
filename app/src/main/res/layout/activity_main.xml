@@ -20,20 +20,8 @@
             android:textColor="#ffffff"
             android:textSize="@dimen/abc_action_bar_progress_bar_size"
             style="@style/btnStyleBreakerBay"
-            android:layout_marginBottom="64dp"/>
-
-        <Button
-            style="@style/btnStyleBreakerBay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Phase Two"
-            android:gravity="bottom"
-            android:layout_centerVertical="true"
-            android:id="@+id/button"
-            android:textColor="#ffffff"
-            android:textSize="@dimen/abc_action_bar_progress_bar_size"
-            android:layout_marginBottom="64dp" />
-
+            android:layout_marginBottom="64dp"
+            android:visibility="invisible"/>
 
         <Button
             style="@style/btnStyleBreakerBay"
@@ -46,6 +34,21 @@
             android:textColor="#ffffff"
             android:textSize="@dimen/abc_action_bar_progress_bar_size"
             android:layout_marginBottom="64dp" />
+
+        <Button
+            style="@style/btnStyleBreakerBay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phase Two"
+            android:gravity="bottom"
+            android:layout_centerVertical="true"
+            android:id="@+id/button"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/abc_action_bar_progress_bar_size"
+            android:layout_marginBottom="64dp"
+            android:visibility="invisible"/>
+
+
     </LinearLayout>
 
     <TextView

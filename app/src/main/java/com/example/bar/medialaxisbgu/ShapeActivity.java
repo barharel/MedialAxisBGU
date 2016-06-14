@@ -47,6 +47,7 @@ public class ShapeActivity extends AppCompatActivity {
     private int m_imageId;
     private int m_current_index;
     private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 16, 15, 14, 13, 12, 11 };
+    private boolean m_screen_locked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,9 +89,9 @@ public class ShapeActivity extends AppCompatActivity {
                 int redValue = Color.red(pixel);
                 int blueValue = Color.blue(pixel);
                 int greenValue = Color.green(pixel);
-                if(redValue < 40 && greenValue < 40 && blueValue < 40)
+                if(redValue < 90 && greenValue < 90 && blueValue < 90)
                     continue;
-                if (!((redValue>240) && (blueValue>240) && (greenValue>240))) {
+                if (!((redValue>220) && (blueValue>220) && (greenValue>220))) {
                     bitmap.setPixel(j, i, Color.rgb(191,191,191));
                 }
             }
@@ -256,55 +257,59 @@ public class ShapeActivity extends AppCompatActivity {
         m_image.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    m_text =    ("Touch coordinates : " + String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));
-                    final String text_to_be_sent = String.valueOf(event.getX()) + "," + String.valueOf(event.getY());
-                    String thanks = "All Done!\n " +
-                            "Thank you for participating in the experiment";
+                if(!m_screen_locked) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        m_text = ("Touch coordinates : " + String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));
+                        final String text_to_be_sent = String.valueOf(event.getX()) + "," + String.valueOf(event.getY());
+                        String thanks = "All Done!\n " +
+                                "Thank you for participating in the experiment";
+                        Log.i(TAG, m_text);
+                        if (!isWhitePixel(event.getX(), event.getY())) {
+                            //improveColoring();
+                            //colorCoord(event.getX(), event.getY());
+                            writeToFile(text_to_be_sent);
+                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
+                            mp.start();
 
-                    if (!isWhitePixel(event.getX(), event.getY())){
-                        //improveColoring();
-                        //colorCoord(event.getX(), event.getY());
-                        writeToFile(text_to_be_sent);
-                        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
-                        mp.start();
+                            //checking we are not done yet
 
-                        //checking we are not done yet
-
-                        if(m_current_index == m_order_Array.length - 1){
-                            /////////////////////////////Dialog///////////////////////////
-                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-                            @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    switch (which) {
-                                        case DialogInterface.BUTTON_POSITIVE:
-                                            //Yes button clicked
-                                            break;
+                            if (m_current_index == m_order_Array.length - 1) {
+                                /////////////////////////////Dialog///////////////////////////
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which) {
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                //Yes button clicked
+                                                break;
+                                        }
+                                        dialog.dismiss();
+                                        finish();
                                     }
-                                    dialog.dismiss();
-                                    finish();
-                                }
-                            };
+                                };
 
-                            AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
-                            builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
+                                AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
+                                builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
 
-                        /////////////////////////End Dialog//////////////////////////
+                                /////////////////////////End Dialog//////////////////////////
+                            } else {
+                                //locking touch
+                                m_screen_locked = true;
+                                //loading new photo
+                                m_current_index++;
+                                m_imageId = m_order_Array[m_current_index];
+
+                                loadShape(m_imageId);
+                                improveColoring();
+
+                                m_screen_locked = false;
+                            }
+                        } else {
+                            MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bad);
+                            mp.start();
                         }
-                        else {
-                            //loading new photo
-                            m_current_index++;
-                            m_imageId = m_order_Array[m_current_index];
-                            loadShape(m_imageId);
-                            improveColoring();
-                        }
-                    }
-                    else {
-                        MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.bad);
-                        mp.start();
                     }
                 }
-
                 return true;
             }
         });
