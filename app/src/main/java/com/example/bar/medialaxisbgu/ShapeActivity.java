@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -15,6 +17,7 @@ import android.os.Environment;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -46,11 +49,12 @@ public class ShapeActivity extends AppCompatActivity {
     private ImageView m_image;
     private int m_imageId;
     private int m_current_index;
-    private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 16, 15, 14, 13, 12, 11 };
+    private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 19, 18, 17, 16, 15, 14, 13, 12, 11 };
     private boolean m_screen_locked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_shape);
         m_image = (ImageView) findViewById(R.id.imageView1);
         addListenerOnView();
@@ -105,40 +109,94 @@ public class ShapeActivity extends AppCompatActivity {
     protected void loadShape(int imageId) {
         switch(imageId){
             case 1:
-                m_image.setImageResource(R.drawable.triangle);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.triangle);
+                else
+                    m_image.setImageResource(R.drawable.triangle_phone);
                 break;
             case 2:
-                m_image.setImageResource(R.drawable.two_rectangles);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.two_rectangles);
+                else
+                    m_image.setImageResource(R.drawable.two_rectangles_phone);
                 break;
             case 3:
-                m_image.setImageResource(R.drawable.rectangle);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_phone);
                 break;
             case 4:
-                m_image.setImageResource(R.drawable.rectangle_missing);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle_missing);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_missing_phone);
                 break;
             case 5:
-                m_image.setImageResource(R.drawable.rectangle_missing_2);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle_missing_2);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_missing_2_phone);
                 break;
             case 6:
-                m_image.setImageResource(R.drawable.circle);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.circle);
+                else
+                    m_image.setImageResource(R.drawable.circle_phone);
                 break;
             case 11:
-                m_image.setImageResource(R.drawable.triangle_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.triangle_hidden);
+                else
+                    m_image.setImageResource(R.drawable.triangle_hidden_phone);
                 break;
             case 12:
-                m_image.setImageResource(R.drawable.two_rectangles_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.two_rectangles_hidden);
+                else
+                    m_image.setImageResource(R.drawable.two_rectangles_hidden_phone);
                 break;
             case 13:
-                m_image.setImageResource(R.drawable.rectangle_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle_hidden);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_hidden_phone);
                 break;
             case 14:
-                m_image.setImageResource(R.drawable.rectangle_missing_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle_missing_hidden);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_missing_hidden_phone);
                 break;
             case 15:
-                m_image.setImageResource(R.drawable.rectangle_missing_2_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.rectangle_missing_2_hidden);
+                else
+                    m_image.setImageResource(R.drawable.rectangle_missing_2_hidden_phone);
+                break;
+            case 17:
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.a1_shape);
+                else
+                    m_image.setImageResource(R.drawable.a1_shape_phone);
+                break;
+            case 18:
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.a2_shape);
+                else
+                    m_image.setImageResource(R.drawable.a2_shape_phone);
+                break;
+            case 19:
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.a3_shape);
+                else
+                    m_image.setImageResource(R.drawable.a3_shape_phone);
                 break;
             case 16:
-                m_image.setImageResource(R.drawable.circle_hidden);
+                if(isTablet(getApplicationContext()))
+                    m_image.setImageResource(R.drawable.circle_hidden);
+                else
+                    m_image.setImageResource(R.drawable.circle_hidden_phone);
                 break;
         }
     }
@@ -264,6 +322,10 @@ public class ShapeActivity extends AppCompatActivity {
                         String thanks = "All Done!\n " +
                                 "Thank you for participating in the experiment";
                         Log.i(TAG, m_text);
+                        String bar = "Image height=" +
+                                m_image.getHeight()+", width:" +
+                                m_image.getWidth();
+                        Log.i(TAG, bar);
                         if (!isWhitePixel(event.getX(), event.getY())) {
                             //improveColoring();
                             //colorCoord(event.getX(), event.getY());
@@ -300,7 +362,8 @@ public class ShapeActivity extends AppCompatActivity {
                                 m_imageId = m_order_Array[m_current_index];
 
                                 loadShape(m_imageId);
-                                improveColoring();
+                                if(isTablet(getApplicationContext()))
+                                    improveColoring();
 
                                 m_screen_locked = false;
                             }
@@ -417,5 +480,11 @@ public class ShapeActivity extends AppCompatActivity {
             if (j>1)
                 break;
         }
+    }
+
+    static boolean isTablet(Context context) {
+        boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
     }
 }

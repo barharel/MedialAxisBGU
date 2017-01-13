@@ -23,4 +23,9 @@
         android:src="@drawable/go_button"
         android:background="#ffffff" />
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="127dp"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>
