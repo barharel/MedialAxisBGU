@@ -22,15 +22,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PhaseOneActivity"
-            android:label="@string/title_activity_main2" >
-            <intent-filter>
-                <action android:name="com.ran.myapplication.Main2Activity" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".ShapeActivity"
             android:label="@string/title_activity_main22" >
             <intent-filter>
@@ -38,10 +29,6 @@
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".PhaseTwoActivity"
-            android:label="@string/title_activity_phase_two" >
         </activity>
         <activity
             android:name=".BeginActivity"
