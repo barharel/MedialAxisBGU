@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
@@ -47,6 +48,9 @@ import java.util.concurrent.ThreadLocalRandom;
 public class BeginActivity extends AppCompatActivity {
     private static final String TAG = "ProjectMessage";
     private ImageView m_image;
+    private ImageView m_image2;
+    private ImageView m_image3;
+    private ImageView m_image4;
     private int m_counter = 0;
     private ImageButton m_go_button;
 
@@ -55,10 +59,18 @@ public class BeginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_begin);
-        m_image = (ImageView) findViewById(R.id.imageView1);
+        m_image = (ImageView) findViewById(R.id.imageView);
+        m_image2 = (ImageView) findViewById(R.id.imageView2);
+        m_image3 = (ImageView) findViewById(R.id.imageView4);
+        m_image4 = (ImageView) findViewById(R.id.imageView3);
         m_go_button = (ImageButton) findViewById(R.id.btnChangeImage);
         m_go_button.setVisibility(View.INVISIBLE);
-        addListenerOnView();
+
+        addListenerOnView(m_image);
+        addListenerOnView(m_image2);
+        addListenerOnView(m_image3);
+        addListenerOnView(m_image4);
+
 
     }
 
@@ -86,30 +98,17 @@ public class BeginActivity extends AppCompatActivity {
 
 
 
-    public boolean isWhitePixel(float eventX, float eventY) {
-        /*Bitmap bitmap = Bitmap.createBitmap(m_image.getDrawingCache())
-        String string = "isWhitePixel (" + String.valueOf(x) + ","  + String.valueOf(y) +
-                ") - (" + String.valueOf(bitmap.getHeight()) + "," + String.valueOf(bitmap.getWidth()) + ")";
-        Log.i(TAG, string);*/
-        //int pixel = bitmap.getPixel((int) x, (int) y);
-        /*int redValue = Color.red(pixel);
-        int blueValue = Color.blue(pixel);
-        int greenValue = Color.green(pixel);
-        String string = "isWhitePixel (" + String.valueOf(x) + ","  + String.valueOf(y) +
-                ") - (" + String.valueOf(redValue) + "," + String.valueOf(blueValue) + "," +
-                String.valueOf(greenValue) + ")";
-        Log.i(TAG, string);
-        return ((redValue>240) && (blueValue>240) && (greenValue>240));*/
+    public boolean isWhitePixel(float eventX, float eventY, ImageView image) {
         float[] eventXY = new float[] {eventX, eventY};
 
         Matrix invertMatrix = new Matrix();
-        ((ImageView)m_image).getImageMatrix().invert(invertMatrix);
+        ((ImageView)image).getImageMatrix().invert(invertMatrix);
 
         invertMatrix.mapPoints(eventXY);
         int x = Integer.valueOf((int) eventXY[0]);
         int y = Integer.valueOf((int) eventXY[1]);
 
-        Drawable imgDrawable = ((ImageView)m_image).getDrawable();
+        Drawable imgDrawable = ((ImageView)image).getDrawable();
         Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
         //Limit x, y range within bitmap
         if(x < 0){
@@ -132,17 +131,94 @@ public class BeginActivity extends AppCompatActivity {
                 ") - (" + String.valueOf(redValue) + "," + String.valueOf(blueValue) + "," +
                 String.valueOf(greenValue) + ")";
         Log.i(TAG, string);
-        return (!(((redValue>198) && (blueValue>198) && (greenValue>198)
+        Boolean result = (!(((redValue>190) && (blueValue>190) && (greenValue>190)
                 && (redValue<210) && (blueValue<210) && (greenValue<210))
-                || ((redValue<10) && (blueValue<10) && (greenValue<10))));
+                || ((redValue<10) && (blueValue<10) && (greenValue<10)))
+        );
+        Log.i(TAG, "isWhitePixel: Result is " + result);
+        return result;
 
 
     }
 
 
-    public void addListenerOnView() {
 
-        m_image.setOnTouchListener(new View.OnTouchListener() {
+    public boolean isInMask(float eventX, float eventY, ImageView image) {
+        float[] eventXY = new float[] {eventX, eventY};
+        switch(image.getId()){
+            case R.id.imageView:
+                return true;
+            case R.id.imageView2:
+                image.setImageResource(R.drawable.example_2_mask);
+                break;
+            case R.id.imageView3:
+                image.setImageResource(R.drawable.example_4_mask);
+                break;
+            case R.id.imageView4:
+                return true;
+        }
+        Matrix invertMatrix = new Matrix();
+
+        //image.setImageBitmap(BitmapFactory.decodeFile("drawable/example_1.bmp"));
+        //image.setImageResource(R.drawable.example_1);
+
+        ((ImageView)image).getImageMatrix().invert(invertMatrix);
+
+        invertMatrix.mapPoints(eventXY);
+        int x = Integer.valueOf((int) eventXY[0]);
+        int y = Integer.valueOf((int) eventXY[1]);
+
+        Drawable imgDrawable = ((ImageView)image).getDrawable();
+        Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
+        //Limit x, y range within bitmap
+        if(x < 0){
+            return true;
+        }else if(x > bitmap.getWidth()-1){
+            return true;
+        }
+
+        if(y < 0){
+            return true;
+        }else if(y > bitmap.getHeight()-1){
+            return true;
+        }
+
+        int pixel = bitmap.getPixel(x, y);
+        int redValue = Color.red(pixel);
+        int blueValue = Color.blue(pixel);
+        int greenValue = Color.green(pixel);
+        String string = "inMask (" + String.valueOf(x) + ","  + String.valueOf(y) +
+                ") - (" + String.valueOf(redValue) + "," + String.valueOf(blueValue) + "," +
+                String.valueOf(greenValue) + ")";
+        Log.i(TAG, string);
+        Boolean result = !((redValue<240) || (blueValue>10) || (greenValue>10));
+
+        Log.i(TAG, "inMask: Result is " + result);
+
+        switch(image.getId()){
+            case R.id.imageView:
+                image.setImageResource(R.drawable.example_1);
+                break;
+            case R.id.imageView2:
+                image.setImageResource(R.drawable.example_2);
+                break;
+            case R.id.imageView3:
+                image.setImageResource(R.drawable.example_4);
+                break;
+            case R.id.imageView4:
+                image.setImageResource(R.drawable.example_3);
+                break;
+
+        }
+        return result;
+
+
+    }
+
+
+    public void addListenerOnView(final ImageView image) {
+
+        image.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -150,10 +226,11 @@ public class BeginActivity extends AppCompatActivity {
                     String thanks = "All Done!\n " +
                             "Thank you for participating in the experiment";
 
-                    if (!isWhitePixel(event.getX(), event.getY())) {
+                    if (!isWhitePixel(event.getX(), event.getY(), image) && isInMask(event.getX(), event.getY(), image)) {
                         MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
                         mp.start();
                         m_counter++;
+                        image.setVisibility(View.INVISIBLE);
                         if(m_counter>3){
                             m_go_button.setVisibility(View.VISIBLE);
                         }
@@ -181,7 +258,10 @@ public class BeginActivity extends AppCompatActivity {
                     // finish();
                     m_counter = 0;
                     m_go_button.setVisibility(View.INVISIBLE);
-
+                    m_image.setVisibility(View.VISIBLE);
+                    m_image2.setVisibility(View.VISIBLE);
+                    m_image3.setVisibility(View.VISIBLE);
+                    m_image4.setVisibility(View.VISIBLE);
                 }
                 return true;
             }

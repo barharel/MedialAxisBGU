@@ -6,13 +6,59 @@
     android:weightSum="1"
     android:background="#ffffff">
 
-    <ImageView
-        android:id="@+id/imageView1"
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/begin_screen"
-        android:layout_weight="0.44"
-        android:layout_gravity="center_horizontal" />
+        android:text="בתמונות שיוצגו לפניך יופיעו עצם אפור אחד או יותר. לעיתים העצם/ים יוסתרו בחלקם ע&quot;י עצם שחור. במקרה זה עליך להתעלם מהעצם השחור ולהתייחס רק לעצם או העצמים האפורים. משימתך היא פשוטה - לגעת  בנקודה אחת כרצונך בתוך אחד מהעצמים האפורים. היות ועליך להתעלם מהעצמים השחורים (אם קיימים), אתה רשאי, אך לא חייב, לגעת בנקודה של עצם אפור המוסתרת ע&quot;י העצם השחור.  "
+        android:id="@+id/textView2"
+        android:layout_gravity="center_horizontal"
+        android:textSize="32sp"
+        />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="672dp"
+                android:layout_height="228dp"
+                android:id="@+id/imageView"
+                android:src="@drawable/example_1" />
+
+            <ImageView
+                android:layout_width="672dp"
+                android:layout_height="228dp"
+                android:id="@+id/imageView2"
+                android:src="@drawable/example_2"
+                android:layout_column="13" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:layout_width="672dp"
+                android:layout_height="228dp"
+                android:id="@+id/imageView4"
+                android:src="@drawable/example_3"
+                android:layout_column="0" />
+
+            <ImageView
+                android:layout_width="672dp"
+                android:layout_height="228dp"
+                android:id="@+id/imageView3"
+                android:src="@drawable/example_4"
+                android:layout_column="13" />
+        </TableRow>
+
+    </TableLayout>
 
     <ImageButton
         android:id="@+id/btnChangeImage"

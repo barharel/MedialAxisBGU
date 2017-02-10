@@ -6,6 +6,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -400,18 +401,28 @@ public class ShapeActivity extends AppCompatActivity {
                                 };
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
-
+                                ArrayList<UserInput> list_of_problematic = new ArrayList<UserInput>();
                                 for (int i = 0; i < m_user_inputs.size(); ++i) {
                                     String text_to_be_sent = String.valueOf(m_user_inputs.get(i).coordinates.first) +
                                             "," + String.valueOf(m_user_inputs.get(i).coordinates.second);
                                     if (m_user_inputs.get(i).out_of_mask) {
                                         text_to_be_sent += ",out";
+                                        list_of_problematic.add(m_user_inputs.get(i));
                                     } else {
                                         text_to_be_sent += ",in";
                                     }
                                     writeToFile(text_to_be_sent, m_user_inputs.get(i).id_of_image);
+
                                 }
 
+                                if(list_of_problematic.size() > 0){
+                                    Intent intent = new Intent(ShapeActivity.this, ShowProblematicShapes.class);
+                                    Bundle b = new Bundle();
+                                    ArrayList<String> myList = new ArrayList<String>();
+                                    intent.putExtra("mylist", list_of_problematic);
+                                    intent.putExtras(b);
+                                    //startActivity(intent);
+                                }
                                 builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
 
                                 /////////////////////////End Dialog//////////////////////////
