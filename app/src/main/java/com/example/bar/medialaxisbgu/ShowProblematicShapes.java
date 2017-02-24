@@ -1,5 +1,7 @@
 package com.example.bar.medialaxisbgu;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -87,6 +89,8 @@ public class ShowProblematicShapes extends AppCompatActivity implements View.OnC
                 m_image.setImageResource(R.drawable.new_8_hidden);
                 break;
         }
+
+        m_image.setBackgroundResource(R.drawable.border);
     }
 
     protected void colorCord(){
@@ -171,6 +175,18 @@ public class ShowProblematicShapes extends AppCompatActivity implements View.OnC
         setButtonAvailability();
     }
 
+    @Override
+    public void onBackPressed() {
+        Log.i(TAG, "finish problematic shapes");
+        Intent intent = new Intent();
+        if (getParent() == null) {
+            setResult(Activity.RESULT_OK, intent);
+        } else {
+            getParent().setResult(Activity.RESULT_OK, intent);
+        }
+        finish();
+        return;
+    }
 
 
     @Override

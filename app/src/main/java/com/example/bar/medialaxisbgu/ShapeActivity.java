@@ -425,7 +425,9 @@ public class ShapeActivity extends AppCompatActivity {
                                     intent.putExtra("mylist", list_of_problematic);
                                     //intent.putParcelableArrayListExtra("mylist", list_of_problematic);
                                     intent.putExtras(b);
-                                    startActivity(intent);
+                                    //startActivity(intent);
+                                    int REQUEST_CODE = 123;
+                                    startActivityForResult(intent, REQUEST_CODE);
                                 }
                                 else
                                     builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
@@ -455,6 +457,14 @@ public class ShapeActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 123) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
