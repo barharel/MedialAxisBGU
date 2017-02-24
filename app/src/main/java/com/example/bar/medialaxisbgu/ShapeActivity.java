@@ -74,7 +74,7 @@ public class ShapeActivity extends AppCompatActivity {
         fixArray(m_order_Array);
         m_imageId = m_order_Array[m_current_index];
         loadShape(m_imageId);
-        improveColoring();
+        //improveColoring();
 
         //Bundle b = getIntent().getExtras();
         //int imageId = b.getInt("key");
@@ -419,11 +419,13 @@ public class ShapeActivity extends AppCompatActivity {
                                     Intent intent = new Intent(ShapeActivity.this, ShowProblematicShapes.class);
                                     Bundle b = new Bundle();
                                     ArrayList<String> myList = new ArrayList<String>();
-                                    intent.putExtra("mylist", list_of_problematic);
+                                    //intent.putExtra("mylist", list_of_problematic);
+                                    intent.putParcelableArrayListExtra("mylist", list_of_problematic);
                                     intent.putExtras(b);
-                                    //startActivity(intent);
+                                    startActivity(intent);
                                 }
-                                builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
+                                else
+                                    builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
 
                                 /////////////////////////End Dialog//////////////////////////
                             } else {
@@ -434,8 +436,8 @@ public class ShapeActivity extends AppCompatActivity {
                                 m_imageId = m_order_Array[m_current_index];
 
                                 loadShape(m_imageId);
-                                if (isTablet(getApplicationContext()))
-                                    improveColoring();
+                                //if (isTablet(getApplicationContext()))
+                                //    improveColoring();
 
                                 m_screen_locked = false;
                             }

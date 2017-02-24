@@ -2,10 +2,12 @@ package com.example.bar.medialaxisbgu;
 
 import android.util.Pair;
 
+import java.io.Serializable;
+
 /**
  * Created by Bar on 13/01/2017.
  */
-public class UserInput {
+public class UserInput implements Serializable {
     public Pair coordinates;
     public boolean out_of_mask;
     public int id_of_image;
