@@ -10,4 +10,5 @@
     <string name="selectPicture">Select picture</string>
     <string name="title_activity_phase_two">PhaseTwoActivity</string>
     <string name="title_activity_instructions">InstructionsActivity</string>
+    <string name="title_activity_show_problematic_shapes">ShowProblematicShapes</string>
 </resources>

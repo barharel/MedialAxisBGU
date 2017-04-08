@@ -1,10 +1,15 @@
 package com.example.bar.medialaxisbgu;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Matrix;
@@ -13,8 +18,10 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.os.Environment;
 import android.os.SystemClock;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +40,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
@@ -44,21 +52,29 @@ public class ShapeActivity extends AppCompatActivity {
     private static final String TAG = "ProjectMessage";
     private String m_text;
     private ImageView m_image;
+    private ImageView m_mask;
     private int m_imageId;
     private int m_current_index;
-    private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 16, 15, 14, 13, 12, 11 };
+    private boolean m_hidden;
+    //private int[] m_order_Array = { 1, 2, 3, 4, 5, 6, 7, 8, 18, 17, 16, 15, 14, 13, 12, 11 };
+    private int[] m_order_Array = { 1, 2, 13, 4, 15, 6, 17, 8, 18, 7, 16, 5, 14, 3, 12, 11 };
+
+    private ArrayList<UserInput> m_user_inputs;
     private boolean m_screen_locked = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        m_user_inputs = new ArrayList<>(m_order_Array.length);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_shape);
         m_image = (ImageView) findViewById(R.id.imageView1);
+        m_mask = (ImageView) findViewById(R.id.mask);
         addListenerOnView();
-        shuffleArray(m_order_Array);
+        //shuffleArray(m_order_Array);
         fixArray(m_order_Array);
         m_imageId = m_order_Array[m_current_index];
         loadShape(m_imageId);
-        improveColoring();
+        //improveColoring();
 
         //Bundle b = getIntent().getExtras();
         //int imageId = b.getInt("key");
@@ -105,40 +121,76 @@ public class ShapeActivity extends AppCompatActivity {
     protected void loadShape(int imageId) {
         switch(imageId){
             case 1:
-                m_image.setImageResource(R.drawable.triangle);
+                m_image.setImageResource(R.drawable.new_1);
+                m_hidden = false;
                 break;
             case 2:
-                m_image.setImageResource(R.drawable.two_rectangles);
+                m_image.setImageResource(R.drawable.new_2);
+                m_hidden = false;
                 break;
             case 3:
-                m_image.setImageResource(R.drawable.rectangle);
+                m_image.setImageResource(R.drawable.new_3);
+                m_hidden = false;
                 break;
             case 4:
-                m_image.setImageResource(R.drawable.rectangle_missing);
+                m_image.setImageResource(R.drawable.new_4);
+                m_hidden = false;
                 break;
             case 5:
-                m_image.setImageResource(R.drawable.rectangle_missing_2);
+                m_image.setImageResource(R.drawable.new_5);
+                m_hidden = false;
                 break;
             case 6:
-                m_image.setImageResource(R.drawable.circle);
+                m_image.setImageResource(R.drawable.new_6);
+                m_hidden = false;
+                break;
+            case 7:
+                m_image.setImageResource(R.drawable.new_7);
+                m_hidden = false;
+                break;
+            case 8:
+                m_image.setImageResource(R.drawable.new_8);
+                m_hidden = false;
                 break;
             case 11:
-                m_image.setImageResource(R.drawable.triangle_hidden);
+                m_image.setImageResource(R.drawable.new_1_hidden);
+                m_mask.setImageResource(R.drawable.new_1_mask);
+                m_hidden = true;
                 break;
             case 12:
-                m_image.setImageResource(R.drawable.two_rectangles_hidden);
+                m_image.setImageResource(R.drawable.new_2_hidden);
+                m_mask.setImageResource(R.drawable.new_2_mask);
+                m_hidden = true;
                 break;
             case 13:
-                m_image.setImageResource(R.drawable.rectangle_hidden);
+                m_image.setImageResource(R.drawable.new_3_hidden);
+                m_mask.setImageResource(R.drawable.new_3_mask);
+                m_hidden = true;
                 break;
             case 14:
-                m_image.setImageResource(R.drawable.rectangle_missing_hidden);
+                m_image.setImageResource(R.drawable.new_4_hidden);
+                m_mask.setImageResource(R.drawable.new_4_mask);
+                m_hidden = true;
                 break;
             case 15:
-                m_image.setImageResource(R.drawable.rectangle_missing_2_hidden);
+                m_image.setImageResource(R.drawable.new_5_hidden);
+                m_mask.setImageResource(R.drawable.new_5_mask);
+                m_hidden = true;
                 break;
             case 16:
-                m_image.setImageResource(R.drawable.circle_hidden);
+                m_image.setImageResource(R.drawable.new_6_hidden);
+                m_mask.setImageResource(R.drawable.new_6_mask);
+                m_hidden = true;
+                break;
+            case 17:
+                m_image.setImageResource(R.drawable.new_7_hidden);
+                m_mask.setImageResource(R.drawable.new_7_mask);
+                m_hidden = true;
+                break;
+            case 18:
+                m_image.setImageResource(R.drawable.new_8_hidden);
+                m_mask.setImageResource(R.drawable.new_8_mask);
+                m_hidden = true;
                 break;
         }
     }
@@ -251,23 +303,83 @@ public class ShapeActivity extends AppCompatActivity {
     }
 
 
+
+    public boolean isOutsideOfMask(float eventX, float eventY) {
+        if (!m_hidden)
+            return false;
+
+        float[] eventXY = new float[] {eventX, eventY};
+
+        Matrix invertMatrix = new Matrix();
+        ((ImageView)m_mask).getImageMatrix().invert(invertMatrix);
+
+        invertMatrix.mapPoints(eventXY);
+        int x = Integer.valueOf((int) eventXY[0]);
+        int y = Integer.valueOf((int) eventXY[1]);
+        Drawable imgDrawable = ((ImageView)m_mask).getDrawable();
+        Bitmap bitmap = ((BitmapDrawable)imgDrawable).getBitmap();
+        //Limit x, y range within bitmap
+        if(x < 0){
+            return true;
+        }else if(x > bitmap.getWidth()-1){
+            return true;
+        }
+
+        if(y < 0){
+            return true;
+        }else if(y > bitmap.getHeight()-1){
+            return true;
+        }
+        m_image.setVisibility(View.INVISIBLE);
+        m_mask.setVisibility(View.VISIBLE);
+        int pixel = bitmap.getPixel(x, y);
+        int redValue = Color.red(pixel);
+        int blueValue = Color.blue(pixel);
+        int greenValue = Color.green(pixel);
+        String string = "isOutsideOfMask (" + String.valueOf(x) + ","  + String.valueOf(y) +
+                ") - (" + String.valueOf(redValue) + "," + String.valueOf(blueValue) + "," +
+                String.valueOf(greenValue) + ")";
+        Log.i(TAG, string);
+        m_image.setVisibility(View.VISIBLE);
+        m_mask.setVisibility(View.INVISIBLE);
+        return ((redValue<240) || (blueValue>10) || (greenValue>10));
+
+
+
+
+    }
+
+
     public void addListenerOnView() {
 
 
         m_image.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(!m_screen_locked) {
+                if (!m_screen_locked) {
                     if (event.getAction() == MotionEvent.ACTION_DOWN) {
                         m_text = ("Touch coordinates : " + String.valueOf(event.getX()) + "x" + String.valueOf(event.getY()));
-                        final String text_to_be_sent = String.valueOf(event.getX()) + "," + String.valueOf(event.getY());
                         String thanks = "All Done!\n " +
                                 "Thank you for participating in the experiment";
                         Log.i(TAG, m_text);
+                        String bar = "Image height=" +
+                                m_image.getHeight() + ", width:" +
+                                m_image.getWidth();
+                        Log.i(TAG, bar);
                         if (!isWhitePixel(event.getX(), event.getY())) {
                             //improveColoring();
                             //colorCoord(event.getX(), event.getY());
-                            writeToFile(text_to_be_sent);
+
+
+                            boolean outside_of_mask = isOutsideOfMask(event.getX(), event.getY());
+                            UserInput user_input = new UserInput(event.getX(), event.getY(),
+                                    outside_of_mask, m_imageId);
+
+                            Log.i(TAG, "Outside of mask = " + outside_of_mask);
+                            m_user_inputs.add(user_input);
+
+
+                            //writeToFile(text_to_be_sent);
                             MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.good);
                             mp.start();
 
@@ -289,7 +401,36 @@ public class ShapeActivity extends AppCompatActivity {
                                 };
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(m_image.getContext());
-                                builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
+                                ArrayList<UserInput> list_of_problematic = new ArrayList<UserInput>();
+                                for (int i = 0; i < m_user_inputs.size(); ++i) {
+                                    //String text_to_be_sent = String.valueOf(m_user_inputs.get(i).coordinates.first) +
+                                    //        "," + String.valueOf(m_user_inputs.get(i).coordinates.second);
+                                    String text_to_be_sent = String.valueOf(m_user_inputs.get(i).x) +
+                                            "," + String.valueOf(m_user_inputs.get(i).y);
+
+                                    if (m_user_inputs.get(i).out_of_mask) {
+                                        text_to_be_sent += ",out";
+                                        list_of_problematic.add(m_user_inputs.get(i));
+                                    } else {
+                                        text_to_be_sent += ",in";
+                                    }
+                                    writeToFile(text_to_be_sent, m_user_inputs.get(i).id_of_image);
+
+                                }
+
+                                if(list_of_problematic.size() > 0){
+                                    Intent intent = new Intent(ShapeActivity.this, ShowProblematicShapes.class);
+                                    Bundle b = new Bundle();
+                                    ArrayList<String> myList = new ArrayList<String>();
+                                    intent.putExtra("mylist", list_of_problematic);
+                                    //intent.putParcelableArrayListExtra("mylist", list_of_problematic);
+                                    intent.putExtras(b);
+                                    //startActivity(intent);
+                                    int REQUEST_CODE = 123;
+                                    startActivityForResult(intent, REQUEST_CODE);
+                                }
+                                else
+                                    builder.setMessage(thanks).setPositiveButton("Exit", dialogClickListener).show();
 
                                 /////////////////////////End Dialog//////////////////////////
                             } else {
@@ -300,7 +441,8 @@ public class ShapeActivity extends AppCompatActivity {
                                 m_imageId = m_order_Array[m_current_index];
 
                                 loadShape(m_imageId);
-                                improveColoring();
+                                //if (isTablet(getApplicationContext()))
+                                //    improveColoring();
 
                                 m_screen_locked = false;
                             }
@@ -315,6 +457,14 @@ public class ShapeActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 123) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -338,17 +488,21 @@ public class ShapeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void writeToFile(String data) {
+    private void writeToFile(String data, int image_id) {
         File file;
         FileOutputStream outputStream;
-
         StringBuilder sb = new StringBuilder();
         sb.append("");
-        sb.append(m_imageId);
+        sb.append(image_id);
         String fileName = sb.toString();
         fileName = fileName + ".csv";
         try {
+            //File root = new File("/sdcard/", "CSProject");
             File root = new File(Environment.getExternalStorageDirectory(), "CSProject");
+            /*java.io.File root = new java.io.File(Environment
+                    .getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    + "/CSProject");*/
+            Log.i(TAG, "Saving to " + Environment.getExternalStorageDirectory());
             if (!root.exists()) {
                 root.mkdirs();
             }
@@ -418,4 +572,12 @@ public class ShapeActivity extends AppCompatActivity {
                 break;
         }
     }
+
+    static boolean isTablet(Context context) {
+        boolean xlarge = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == 4);
+        boolean large = ((context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE);
+        return (xlarge || large);
+    }
+
 }
+
